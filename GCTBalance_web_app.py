@@ -1,4 +1,4 @@
-# panel serve test2.py
+# panel serve GCTBalance_web_app.py
 # http://localhost:5006/test2
 import pandas as pd
 import csv
