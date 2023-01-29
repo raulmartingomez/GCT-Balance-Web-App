@@ -121,10 +121,10 @@ def on_select(file):
                 df_stats = pd.concat([df_stats, new_row], ignore_index=True)
             
             # Create a new column 'color' that maps the values of the 'Slope' column to specific colors
-            df_basic['Slope_color'] = df_basic['Slope'].map({1: 'red', 2: 'green', 3: 'blue'})
+            df_all['Slope_color'] = df_all['Num_Slope'].map({1: 'red', 2: 'green', 3: 'blue'})
             print(df_stats) 
 
-        create_plot(df_basic)       
+        create_plot("")       
         # Update the plot widget
         plot_widget.object = plot   
         table_widget._update_data(df_stats)
@@ -133,16 +133,32 @@ def on_select(file):
         print("No file selected")
 
 from bokeh.models import HoverTool
+from bokeh.models import LinearAxis, Label
+from bokeh.models import Range1d
 
-
-def create_plot(df):
-    global plot
+def create_plot(value):
+    global plot   
+    print ("create_plo called")
+    print (value) 
     plot = figure(title="GCT Balance", x_axis_label="Time (s)", y_axis_label="R     % Balance     L", plot_width=1100, plot_height=350)
     # Pass the 'color' column as the color parameter to the scatter method
-    plot.scatter(x=df_basic['Time_r'], y=df_basic['Balance'], color=df_basic['Slope_color'], size=1, alpha=0.8)
-    # plot.scatter(x=df['Time_r'], y=df['Balance'], size=3, color="red", alpha=0.8)
-    plot.line(x=df['Time_r'], y=[50 for _ in range(len(df))], line_color='black', line_width=0.5)
+    plot.scatter(x=df_all['Time_r'], y=df_all['Balance'], color=df_all['Slope_color'], size=1, alpha=0.8)
     hover = HoverTool(tooltips=[("Time", "@x{0.0}s"), ("Balance", "@y{0.1}%")])
+    if value == 'Elevation':
+        print ("Yes, the code is inside the conditional Elevation")
+        plot.scatter(x=df_all['Time_r'], y=df_all['Altitud'], size=0.2, alpha=0.8, y_range_name="elevation", color='grey')
+        plot.yaxis.y_range_name = 'elevation'
+        plot.extra_y_ranges = {"elevation": Range1d(start=min(df_all['Altitud']), end=max(df_all['Altitud']))}
+        plot.add_layout(LinearAxis(y_range_name="elevation", axis_label='Elevation'), 'right')
+        hover = HoverTool(tooltips=[("Time", "@x{0.0}s"), ("Balance", "@y{0.1}%"), ("Elevation", "@y{0.1}m"), ("Speed", "@y{0.1}km/h")])
+    elif value == 'Speed':
+        print ("Yes, the code is inside the conditional Speed")
+        plot.scatter(x=df_all['Time_r'], y=df_all['Speed'], size=0.2, alpha=0.8, y_range_name="speed", color='grey')
+        plot.yaxis.y_range_name = 'speed'
+        plot.extra_y_ranges = {"speed": Range1d(start=min(df_all['Speed']), end=max(df_all['Speed']))}
+        plot.add_layout(LinearAxis(y_range_name="speed", axis_label='Speed'), 'right')
+        hover = HoverTool(tooltips=[("Time", "@x{0.0}s"), ("Balance", "@y{0.1}%"), ("Speed", "@y{0.1}km/h")])
+    plot.line(x=df_all['Time_r'], y=[50 for _ in range(len(df_all))], line_color='black', line_width=0.5)
     plot.add_tools(hover)
     plot.y_range.start = 44
     plot.y_range.end = 56
@@ -152,6 +168,20 @@ def create_plot(df):
     plot.add_layout(label1)
     plot.add_layout(label2)
     plot.add_layout(label3)
+    plot_widget.object = plot     
+
+extra_data = pn.widgets.RadioButtonGroup(
+    name='Extra data', 
+    options=['      ', 'Elevation','Speed'],
+    button_type='success'
+)
+
+def on_change(event):
+    print ("on change called")
+    print (event)
+    create_plot(event.new)
+    
+extra_data.param.watch(on_change, 'value')
 
 
 # Create a Bokeh widget to display the plot
@@ -163,11 +193,7 @@ type_balance = pn.widgets.RadioButtonGroup(
     button_type='success'
 )
 
-extra_data = pn.widgets.RadioButtonGroup(
-    name='Extra data', 
-    options=['      ', 'Elevation','Speed'],
-    button_type='success'
-)
+
 
 data = [{'Stat': '', 'Mean': '','STD': '', 'Number of data': ''}]
 df_stats = pd.DataFrame(data)
