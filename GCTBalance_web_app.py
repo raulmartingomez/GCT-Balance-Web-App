@@ -10,15 +10,16 @@ pn.extension('tabulator')
 from bokeh.plotting import figure, show
 from bokeh.models.annotations import Label
 from bokeh.models import Div
-#import holoviews as hv
-#import hvplot.pandas
+from bokeh.models import HoverTool
+from bokeh.models import LinearAxis, Label
+from bokeh.models import Range1d
 
 # Initialize the plot variable
 plot = None
 
 df_all = pd.DataFrame()
 df_basic = pd.DataFrame()
-df_stats = None
+df_stats = pd.DataFrame()
 
 # Create a file input widget using the panel.widgets.FileInput widget
 file_input = pn.widgets.FileInput()
@@ -32,27 +33,19 @@ file_path_pane = pn.pane.Markdown("No file selected")
 # Define a callback function that will be called when the user selects a file
 @pn.depends(file_input)
 def on_select(file):
-
     global df_basic, df_all, df_stats
     global file_path
     global time_start
     global time_end
     global time_slider
     global table_widget
-    # Creates de variables
-    #altitud = 0
     last_altitud = 0
     slope_data = 0
     speed_data = 0
     time_start = 0
-
-    # Creates the DataFrames
-    df_all = pd.DataFrame()
-    df_basic = pd.DataFrame()
-    df_stats = pd.DataFrame()
-
     # Reference for slope calculation
     incline_speed_ref=0.2
+
     if file is not None:
         p = Popen([r'FitToCSV.bat', file_input.filename], stdout=PIPE, stderr=PIPE)
         output, errors = p.communicate()
@@ -132,10 +125,6 @@ def on_select(file):
     else:
         print("No file selected")
 
-from bokeh.models import HoverTool
-from bokeh.models import LinearAxis, Label
-from bokeh.models import Range1d
-
 def create_plot(value):
     global plot   
     print ("create_plo called")
@@ -183,7 +172,6 @@ def on_change(event):
     
 extra_data.param.watch(on_change, 'value')
 
-
 # Create a Bokeh widget to display the plot
 plot_widget = pn.pane.Bokeh(plot)
 
@@ -192,8 +180,6 @@ type_balance = pn.widgets.RadioButtonGroup(
     options=['Balance Up/Down/Flat', 'Balance vs Speed'],
     button_type='success'
 )
-
-
 
 data = [{'Stat': '', 'Mean': '','STD': '', 'Number of data': ''}]
 df_stats = pd.DataFrame(data)
