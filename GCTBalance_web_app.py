@@ -48,7 +48,7 @@ def on_select(file):
     incline_speed_ref=0.2
 
     if file is not None:
-        label_widget.value = 'Inside file is not None'
+        label_widget.value = ('Inside file is not None, filename= ' +str(file_input.filename))
         p = Popen([r'FitToCSV.bat', file_input.filename], stdout=PIPE, stderr=PIPE)
         label_widget.value = 'After Popen'
         output, errors = p.communicate()
