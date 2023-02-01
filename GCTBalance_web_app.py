@@ -49,13 +49,13 @@ def on_select(file):
 
     if file is not None:
         label_widget.value = ('Inside file is not None, filename= ' +str(file_input.filename))
-        p = Popen([r'FitToCSV.bat', file_input.filename], stdout=PIPE, stderr=PIPE)
+        p = Popen([r'FitToCSV.bat', r'C:/'+file_input.filename], stdout=PIPE, stderr=PIPE)
         label_widget.value = 'After Popen'
         output, errors = p.communicate()
         p.wait() # wait for process to terminate
         file_name = os.path.splitext(file_input.filename)[0]
         # Open csv file and get the information
-        with open(file_name + r".csv") as csv_file:
+        with open(r'C:/'+file_name + r".csv") as csv_file:
             csv_reader=csv.reader(csv_file, delimiter=',')
             for row in csv_reader:
                 if "timestamp" in row:
