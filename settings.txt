@@ -1,0 +1,3 @@
+bokeh serve --show GCTBalance_web_app.py
+panel serve GCTBalance_web_app.py --address 0.0.0.0 --port 8080 --allow-websocket-origin="*"
+bokeh serve --show GCTBalance_web_app.py --address 0.0.0.0 --port 8080 --allow-websocket-origin="*"
