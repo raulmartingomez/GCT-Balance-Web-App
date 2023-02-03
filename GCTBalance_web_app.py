@@ -54,14 +54,10 @@ def on_select(file):
     speed_data = 0
     time_start = 0
     # Reference for slope calculation
-    label_widget.value = ('Inside on_select before desplaying file_input.filename')
-    label_widget.value = ('Inside on_select'+str(file_input.filename))
     incline_speed_ref=0.2
 
     if file is not None:
-        label_widget.value = 'Inside file is not None'
         p = Popen([r'FitToCSV.bat', file_input.filename], stdout=PIPE, stderr=PIPE)
-        label_widget.value = 'After Popen'
         output, errors = p.communicate()
         p.wait() # wait for process to terminate
         file_name = os.path.splitext(file_input.filename)[0]
@@ -200,8 +196,6 @@ df_stats = pd.DataFrame(data)
 print (df_stats)
 table_widget = pn.widgets.Tabulator(df_stats,show_index=False)
 
-label_widget = pn.widgets.TextInput(name='This controls labels', value='LABEL TEXT')
-
 template = pn.template.FastListTemplate(
     title='GCT Balance', 
     sidebar=[pn.pane.Markdown("# GCT Balance"), 
@@ -210,7 +204,7 @@ template = pn.template.FastListTemplate(
              pn.Column(file_input, on_select),
              type_balance,
              extra_data],
-    main=[label_widget,plot_widget, table_widget, ],  
+    main=[plot_widget, table_widget],  
     accent_base_color="#88d8b0",
     header_background="#88d8b0",
 )
