@@ -1,8 +1,9 @@
-# bokeh serve --show GCTBalance_web_app_bokeh.py
+# bokeh serve --show GCTBalance_web_app.py
 from bokeh.io import curdoc
 from bokeh.models.widgets import FileInput
-from bokeh.models import ColumnDataSource, DataTable, TableColumn
+from bokeh.models import ColumnDataSource, DataTable, TableColumn, Label, Div
 from bokeh.layouts import column, row 
+from bokeh.models import Column, Row
 import base64
 import io
 from numpy.lib.utils import source
@@ -20,7 +21,15 @@ df = pd.DataFrame()
 source1 = ColumnDataSource(df)
 columns = [TableColumn(field=col, title=col) for col in df.columns]
 file_input1 = FileInput(accept=".csv", width=400)
-# Callback
+# Create a label for displaying progress
+progress_bar = Div(text="", width=500, height=30, style={'background-color': 'lightgray', 'border': '1px solid black'})
+
+def update_progress(percent):
+    # progress_bar.text = f"<div style='background-color: lightblue; width: {percent}%; height: 100%;'></div>"
+    progress_bar.text = str(percent)
+    progress_bar.update()
+    
+
 def upload_data1(attr, old, new):
     global df_basic, df_all, df_stats
     global file_path
@@ -38,9 +47,12 @@ def upload_data1(attr, old, new):
     f = io.BytesIO(decoded)
     df = pd.read_csv(f)
     print(df.shape)
+    n = len(df)
     for index, row in df.iterrows():
         row_list = row.tolist()
         row = row_list
+        percent = (index + 1) / n * 100
+        update_progress(percent)
         if "timestamp" in row:
             if int(row[row.index("timestamp")+1]) > 1:
                 time = int(row[row.index("timestamp")+1])
@@ -103,10 +115,13 @@ def upload_data1(attr, old, new):
     df_all['Slope_color'] = df_all['Num_Slope'].map({1: 'red', 2: 'green', 3: 'blue'})
     print(df_all.shape)
     print(df_stats) 
-    source1.data = df_stats.head()
+    source1.data = df_stats
     data_table1.columns =[TableColumn(field=col, title=col) for col in df_stats.columns]
 
 file_input1.on_change('value', upload_data1)
 data_table1 = DataTable(source=source1, columns=columns, width=400, height=1000)
 
-curdoc().add_root(column(row(file_input1),row(data_table1)))
+# Layout of the app
+curdoc().add_root(column(row(file_input1), row(progress_bar), row(data_table1)))
+
+
