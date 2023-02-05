@@ -10,7 +10,6 @@ from numpy.lib.utils import source
 import pandas as pd
 from pandas.io.pytables import Table
 
-
 # Initialize the plot variable
 plot = None
 
@@ -27,8 +26,7 @@ progress_bar = Div(text="", width=500, height=30, style={'background-color': 'li
 def update_progress(percent):
     # progress_bar.text = f"<div style='background-color: lightblue; width: {percent}%; height: 100%;'></div>"
     progress_bar.text = str(percent)
-    progress_bar.update()
-    
+    progress_bar.update()  
 
 def upload_data1(attr, old, new):
     global df_basic, df_all, df_stats
@@ -123,5 +121,3 @@ data_table1 = DataTable(source=source1, columns=columns, width=400, height=1000)
 
 # Layout of the app
 curdoc().add_root(column(row(file_input1), row(progress_bar), row(data_table1)))
-
-
